@@ -176,3 +176,34 @@ func (account* Account) AddFile(path, filename string, content io.ReadCloser) er
 
     return nil
 }
+
+func (account* Account) List(path string) (string, error) {
+    _, err := account.GetCredentials()
+    if err != nil {
+        return "", err
+    }
+
+    if path == "" {
+        path = "/"
+    }
+
+    req, err := http.NewRequest("GET", account.Credentials.Endpoint + "/default" + path, nil)
+    req.Header.Set("X-Auth-Token", account.Credentials.Token)
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return "", err
+    }
+
+    if resp.StatusCode != 200 {
+        return "", nil
+    }
+
+    defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+    return string(body), nil
+}
