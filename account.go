@@ -153,11 +153,11 @@ func (account *Account) Call(endpoint, method string, params map[string]string, 
 	return body, nil
 }
 
-func (account *Account) AddFile(path, filename string, content io.ReadCloser) error {
-	_, err := account.GetCredentials()
-	if err != nil {
-		return err
-	}
+func (account* Account) AddFile(path, filename string, content io.Reader) error {
+    _, err := account.GetCredentials()
+    if err != nil {
+        return err
+    }
 
 	if path == "" {
 		path = "/"
