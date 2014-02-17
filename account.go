@@ -178,15 +178,12 @@ func (account *Account) AddFile(path, filename string, content io.Reader) error 
 	return nil
 }
 
-func (account *Account) List(path string) (*Files, error) {
+func (account *Account) ListFiles(path string) (*Files, error) {
 	_, err := account.GetCredentials()
 	if err != nil {
 		return nil, err
 	}
 
-	/*
-	   curl -XGET -H'X-Auth-Token: b82b19c190844bcc81b2d50160377b2d' https://lb1.hubic.ovh.net/v1/AUTH_dba1684f3cf3d7b992330c3d38b499e7/default?prefix=WP8/\&delimiter=/\&format=json
-	*/
 	req, err := http.NewRequest("GET", account.Credentials.Endpoint+"/default?prefix="+path+"&delimiter=/&format=json", nil)
 	req.Header.Set("X-Auth-Token", account.Credentials.Token)
 
