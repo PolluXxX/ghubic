@@ -1,8 +1,9 @@
 package ghubic
 
 import (
-	"goauth2"
 	"net/url"
+
+	"github.com/polluxxx/goauth2"
 )
 
 const (

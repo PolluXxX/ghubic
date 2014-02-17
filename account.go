@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"goauth2"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-    "io"
+
+	"github.com/polluxxx/goauth2"
 )
 
 type Account struct {
@@ -152,58 +153,58 @@ func (account *Account) Call(endpoint, method string, params map[string]string, 
 	return body, nil
 }
 
-func (account* Account) AddFile(path, filename string, content io.ReadCloser) error {
-    _, err := account.GetCredentials()
-    if err != nil {
-        return err
-    }
+func (account *Account) AddFile(path, filename string, content io.ReadCloser) error {
+	_, err := account.GetCredentials()
+	if err != nil {
+		return err
+	}
 
-    if path == "" {
-        path = "/"
-    }
+	if path == "" {
+		path = "/"
+	}
 
-    req, err := http.NewRequest("PUT", account.Credentials.Endpoint + "/default" + path + filename, content)
-    req.Header.Set("X-Auth-Token", account.Credentials.Token)
+	req, err := http.NewRequest("PUT", account.Credentials.Endpoint+"/default"+path+filename, content)
+	req.Header.Set("X-Auth-Token", account.Credentials.Token)
 
-    resp, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return err
-    }
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
 
-    if resp.StatusCode != 201 {
-        return nil
-    }
+	if resp.StatusCode != 201 {
+		return nil
+	}
 
-    return nil
+	return nil
 }
 
-func (account* Account) List(path string) (string, error) {
-    _, err := account.GetCredentials()
-    if err != nil {
-        return "", err
-    }
+func (account *Account) List(path string) (string, error) {
+	_, err := account.GetCredentials()
+	if err != nil {
+		return "", err
+	}
 
-    if path == "" {
-        path = "/"
-    }
+	if path == "" {
+		path = "/"
+	}
 
-    req, err := http.NewRequest("GET", account.Credentials.Endpoint + "/default" + path, nil)
-    req.Header.Set("X-Auth-Token", account.Credentials.Token)
+	req, err := http.NewRequest("GET", account.Credentials.Endpoint+"/default"+path, nil)
+	req.Header.Set("X-Auth-Token", account.Credentials.Token)
 
-    resp, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return "", err
-    }
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
 
-    if resp.StatusCode != 200 {
-        return "", nil
-    }
+	if resp.StatusCode != 200 {
+		return "", nil
+	}
 
-    defer resp.Body.Close()
+	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 
-    return string(body), nil
+	return string(body), nil
 }
