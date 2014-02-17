@@ -153,11 +153,11 @@ func (account *Account) Call(endpoint, method string, params map[string]string, 
 	return body, nil
 }
 
-func (account* Account) AddFile(path, filename string, content io.Reader) error {
-    _, err := account.GetCredentials()
-    if err != nil {
-        return err
-    }
+func (account *Account) AddFile(path, filename string, content io.Reader) error {
+	_, err := account.GetCredentials()
+	if err != nil {
+		return err
+	}
 
 	if path == "" {
 		path = "/"
@@ -178,33 +178,38 @@ func (account* Account) AddFile(path, filename string, content io.Reader) error 
 	return nil
 }
 
-func (account *Account) List(path string) (string, error) {
+func (account *Account) List(path string) (*Files, error) {
 	_, err := account.GetCredentials()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	if path == "" {
-		path = "/"
-	}
-
-	req, err := http.NewRequest("GET", account.Credentials.Endpoint+"/default"+path, nil)
+	/*
+	   curl -XGET -H'X-Auth-Token: b82b19c190844bcc81b2d50160377b2d' https://lb1.hubic.ovh.net/v1/AUTH_dba1684f3cf3d7b992330c3d38b499e7/default?prefix=WP8/\&delimiter=/\&format=json
+	*/
+	req, err := http.NewRequest("GET", account.Credentials.Endpoint+"/default?prefix="+path+"&delimiter=/&format=json", nil)
 	req.Header.Set("X-Auth-Token", account.Credentials.Token)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
-		return "", nil
+		return nil, nil
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(body), nil
+	files := new(Files)
+	err = json.Unmarshal(body, files)
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
